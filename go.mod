@@ -1,4 +1,4 @@
-module mqtt_auth_info
+module github.com/zhangsq-ax/mqtt_auth_info
 
 go 1.15
 
