@@ -7,7 +7,15 @@ import (
 	"fmt"
 )
 
+type ConnectionProtocol string
+
+const (
+	ConnectionProtocol_TCP ConnectionProtocol = "tcp"	// 端口 1883
+	ConnectionProtocol_SSL ConnectionProtocol = "ssl"	// 端口 8883
+)
+
 type MQTTAuthInfo struct {
+	Protocol ConnectionProtocol // 连接协议
 	InstanceID string // 服务实例标识
 	Host       string // 服务接入点
 	Port       int    // 服务接入点端口
@@ -18,8 +26,17 @@ type MQTTAuthInfo struct {
 }
 
 func (a *MQTTAuthInfo) GetSignatureInfo() *SignatureInfo {
+	port := a.Port
+	if port == 0 {
+		switch a.Protocol {
+		case ConnectionProtocol_TCP:
+			port = 1883
+		case ConnectionProtocol_SSL:
+			port = 8883
+		}
+	}
 	clientId := fmt.Sprintf("%s@@@%s", a.GroupID, a.ClientID)
-	broker := fmt.Sprintf("tcp://%s:%d", a.Host, a.Port)
+	broker := fmt.Sprintf("%s://%s:%d", a.Protocol, a.Host, port)
 	username := fmt.Sprintf("Signature|%s|%s", a.AccessKey, a.InstanceID)
 	mac := hmac.New(sha1.New, []byte(a.SecretKey))
 	mac.Write([]byte(clientId))
