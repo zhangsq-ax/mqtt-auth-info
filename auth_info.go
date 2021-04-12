@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -56,9 +57,13 @@ func (a *MQTTAuthInfo) GetClient(authType AuthType, onConnect mqtt.OnConnectHand
 }
 
 func UpdateToken(client mqtt.Client, tokenInfo *TokenInfo) error {
-	token := client.Publish("$SYS/uploadToken", 2, false, client)
+	payload, err := json.Marshal(client)
+	if err != nil {
+		return err
+	}
+	token := client.Publish("$SYS/uploadToken", 2, false, payload)
 	token.Wait()
-	err := token.Error()
+	err = token.Error()
 	return err
 }
 
