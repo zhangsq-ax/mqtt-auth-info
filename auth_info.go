@@ -34,6 +34,11 @@ const (
 	AuthTypeDevice AuthType = "DeviceCredential" // 一机一密鉴权模式
 )
 
+type TokenInfo struct {
+	Type  string `json:"type"`
+	Token string `json:"token"`
+}
+
 type MQTTAuthInfo struct {
 	Protocol    ConnectionProtocol // 连接协议
 	InstanceID  string             // 服务实例标识
@@ -48,6 +53,13 @@ type MQTTAuthInfo struct {
 func (a *MQTTAuthInfo) GetClient(authType AuthType, onConnect mqtt.OnConnectHandler, onConnectionLost mqtt.ConnectionLostHandler) mqtt.Client {
 	connectOpts := a.getConnectOptions(authType)
 	return getClient(connectOpts, onConnect, onConnectionLost)
+}
+
+func UpdateToken(client mqtt.Client, tokenInfo *TokenInfo) error {
+	token := client.Publish("$SYS/uploadToken", 2, false, client)
+	token.Wait()
+	err := token.Error()
+	return err
 }
 
 func (a *MQTTAuthInfo) getConnectOptions(authType AuthType) *ConnectOptions {
@@ -83,7 +95,8 @@ func (a *MQTTAuthInfo) standardPort(port int) int {
 }
 
 func getClient(connectOpts *ConnectOptions, onConnect mqtt.OnConnectHandler, onConnectionLost mqtt.ConnectionLostHandler) mqtt.Client {
-	opts := getMQTTClientOptions(connectOpts)
+	//opts := getMQTTClientOptions(connectOpts)
+	opts := connectOpts.GetMQTTClientOptions()
 
 	if onConnect == nil {
 		opts.OnConnect = func(client mqtt.Client) {
@@ -104,7 +117,7 @@ func getClient(connectOpts *ConnectOptions, onConnect mqtt.OnConnectHandler, onC
 	return mqtt.NewClient(opts)
 }
 
-func getMQTTClientOptions(connectOpts *ConnectOptions) *mqtt.ClientOptions {
+/* func getMQTTClientOptions(connectOpts *ConnectOptions) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(connectOpts.Broker)
 	opts.SetClientID(connectOpts.ClientID)
@@ -112,4 +125,4 @@ func getMQTTClientOptions(connectOpts *ConnectOptions) *mqtt.ClientOptions {
 	opts.SetPassword(connectOpts.Password)
 
 	return opts
-}
+} */

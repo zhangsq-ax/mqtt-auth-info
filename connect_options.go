@@ -9,12 +9,12 @@ type ConnectOptions struct {
 	ClientID string
 }
 
-func (ci *ConnectOptions) GetMQTTClientOptions() *mqtt.ClientOptions {
+func (co *ConnectOptions) GetMQTTClientOptions() *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(ci.Broker)
-	opts.SetClientID(ci.ClientID)
-	opts.SetUsername(ci.Username)
-	opts.SetPassword(ci.Password)
+	opts.AddBroker(co.Broker)
+	opts.SetClientID(co.ClientID)
+	opts.SetUsername(co.Username)
+	opts.SetPassword(co.Password)
 
 	return opts
 }
