@@ -83,7 +83,8 @@ func (a *MQTTAuthInfo) standardPort(port int) int {
 }
 
 func getClient(connectOpts *ConnectOptions, onConnect mqtt.OnConnectHandler, onConnectionLost mqtt.ConnectionLostHandler) mqtt.Client {
-	opts := getMQTTClientOptions(connectOpts)
+	//opts := getMQTTClientOptions(connectOpts)
+	opts := connectOpts.GetMQTTClientOptions()
 
 	if onConnect == nil {
 		opts.OnConnect = func(client mqtt.Client) {
@@ -104,7 +105,7 @@ func getClient(connectOpts *ConnectOptions, onConnect mqtt.OnConnectHandler, onC
 	return mqtt.NewClient(opts)
 }
 
-func getMQTTClientOptions(connectOpts *ConnectOptions) *mqtt.ClientOptions {
+/* func getMQTTClientOptions(connectOpts *ConnectOptions) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(connectOpts.Broker)
 	opts.SetClientID(connectOpts.ClientID)
@@ -112,4 +113,4 @@ func getMQTTClientOptions(connectOpts *ConnectOptions) *mqtt.ClientOptions {
 	opts.SetPassword(connectOpts.Password)
 
 	return opts
-}
+} */
